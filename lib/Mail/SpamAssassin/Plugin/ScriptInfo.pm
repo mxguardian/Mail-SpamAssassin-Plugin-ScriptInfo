@@ -56,6 +56,11 @@ script text.  This is useful for detecting phishing attacks.
    Kent Oyer <kent@mxguardian.net>
    Copyright (C) 2023 MXGuardian, LLC
 
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Apache License, Version 2.0.
+
 =cut
 
 sub dbg { Mail::SpamAssassin::Logger::dbg ("ScriptInfo: @_"); }
