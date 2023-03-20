@@ -143,7 +143,7 @@ sub _run_script_rules {
             my $re = $pms->{conf}->{script_rules}->{$name};
             dbg("running rule $name $re");
             foreach my $line (@$script_text) {
-                if ( $line =~ /$re/op ) {
+                if ( $line =~ /$re/p ) {
                     dbg(qq(ran rule $name ======> got hit ").(defined ${^MATCH} ? ${^MATCH} : '<negative match>').qq("));
                     my $score = $pms->{conf}->{scores}->{$name} || 1;
                     $pms->got_hit($name,'SCRIPT: ','ruletype' => 'rawbody', 'score' => $score);
