@@ -1,1 +1,10 @@
+# Ignore IDE project files
 .idea/
+
+# Ignore compiled files and metadata files
+blib/
+META.yml
+META.json
+
+# Ignore backup files and editor temporary files
+*~

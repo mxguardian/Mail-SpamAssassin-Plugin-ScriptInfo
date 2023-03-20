@@ -7,6 +7,7 @@ use Mail::SpamAssassin::Logger ();
 use Mail::SpamAssassin::Util qw(compile_regexp);
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
+our $VERSION = 0.01;
 
 =head1 NAME
 
@@ -19,7 +20,8 @@ and attachments
 
 =head1 DESCRIPTION
 
-This plugin analyzes scripts embedded in HTML messages and attachments
+This plugin analyzes scripts embedded in HTML messages and attachments. Most of the time this will be
+JavaScript, but it will match any text found inside a <script> tag.
 
 =head1 CONFIGURATION
 
