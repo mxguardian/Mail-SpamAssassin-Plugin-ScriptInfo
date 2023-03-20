@@ -41,3 +41,8 @@ The following configuration options are available:
 
     Kent Oyer <kent@mxguardian.net>
     Copyright (C) 2023 MXGuardian, LLC
+
+# LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Apache License, Version 2.0.
