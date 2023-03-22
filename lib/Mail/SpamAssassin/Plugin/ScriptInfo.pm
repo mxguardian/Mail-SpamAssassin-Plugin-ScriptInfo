@@ -7,7 +7,7 @@ use Mail::SpamAssassin::Logger ();
 use Mail::SpamAssassin::Util qw(compile_regexp);
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 =head1 NAME
 
@@ -145,6 +145,7 @@ sub _run_script_rules {
             foreach my $line (@$script_text) {
                 if ( $line =~ /$re/p ) {
                     dbg(qq(ran rule $name ======> got hit ").(defined ${^MATCH} ? ${^MATCH} : '<negative match>').qq("));
+                    $pms->{pattern_hits}->{$name} = ${^MATCH} if defined ${^MATCH};
                     my $score = $pms->{conf}->{scores}->{$name} || 1;
                     $pms->got_hit($name,'SCRIPT: ','ruletype' => 'rawbody', 'score' => $score);
                     last;

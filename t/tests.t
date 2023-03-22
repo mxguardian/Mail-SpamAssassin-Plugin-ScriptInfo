@@ -27,19 +27,23 @@ EOF
 my @files = (
     {
         name  => 'msg1.eml',
-        tests => {
+        hits => {
             'SCRIPT_INFO_01' => 1,
-        }
+        },
+        pattern_hits => {}
     },
     {
-        name  => 'msg2.eml',
-        tests => {
+        name         => 'msg2.eml',
+        hits         => {
             'SCRIPT_INFO_02' => 1,
+        },
+        pattern_hits => {
+            'SCRIPT_INFO_02' => '\x62\x63\x62\x35\x37'
         }
     }
 );
 
-plan tests => scalar @files;
+plan tests => scalar(@files) * 2;
 
 # test each file
 foreach my $file (@files) {
@@ -50,10 +54,15 @@ foreach my $file (@files) {
     my $pms = $spamassassin->check($msg);
     close $fh;
     my $hits = $pms->get_names_of_tests_hit_with_scores_hash();
+    my $pattern_hits = $pms->{pattern_hits};
     # print Dumper($hits);
     foreach my $test (keys %$hits) {
         delete $hits->{$test} unless $test =~ /^SCRIPT_INFO/;
     }
-    is_deeply($hits, $file->{tests}, $file->{name});
+    foreach my $test (keys %$pattern_hits) {
+        delete $pattern_hits->{$test} unless $test =~ /^SCRIPT_INFO/;
+    }
+    is_deeply($hits, $file->{hits}, $file->{name});
+    is_deeply($pattern_hits, $file->{pattern_hits}, $file->{name});
 }
 
