@@ -67,11 +67,21 @@ my @files = (
             'SCRIPT_INFO_04' => 'abcdefghi'
         }
     },
-    # ATD3nA9hT3Hd - test for false positive
+    # ATD3nA9hT3Hd - ham, no hits
     {
         name         => 'msg5.eml',
         hits         => {},
         pattern_hits => {},
+    },
+    # T4n4AKKu9pyc - type=application/octet-stream
+    {
+        name         => 'msg6.eml',
+        hits         => {
+            'SCRIPT_INFO_03' => 1,
+        },
+        pattern_hits => {
+            'SCRIPT_INFO_03' => 'atob('
+        },
     },
 );
 

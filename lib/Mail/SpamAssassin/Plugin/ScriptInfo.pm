@@ -10,7 +10,7 @@ use HTML::Parser;
 use Data::Dumper;
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 =head1 NAME
 
@@ -83,6 +83,7 @@ sub new {
     $self->set_config($mailsaobject->{conf});
 
     $self->register_eval_rule("check_script_contains_email");
+
 
     return $self;
 }
@@ -229,14 +230,14 @@ sub _get_script_text {
         }, 'tagname' ],
     );
 
-    # cycle through all parts of the message and parse any text/html attachments
-    foreach my $p ($pms->{msg}->find_parts(qr/./)) {
-        next unless $p->effective_type eq 'text/html';
-        # ignore inline parts without a name. Modern email clients won't execute scripts in the body
-        # so we skip these parts to avoid false positives.
-        next unless defined $p->{name};
+    defined($pms->{attachments}) or
+        die "Mail::SpamAssassin::Plugin::ScriptInfo requires Mail::SpamAssassin::Plugin::AttachmentDetail";
 
-        my $text = $p->decode();
+    # cycle through all parts of the message and parse any text/html attachments
+    foreach my $a ( @{$pms->{attachments}} )  {
+        next unless $a->{effective_type} eq 'text/html';
+
+        my $text = $a->{part}->decode();
 
         # Normalize unicode quotes, messes up attributes parsing
         # U+201C e2 80 9c LEFT DOUBLE QUOTATION MARK
