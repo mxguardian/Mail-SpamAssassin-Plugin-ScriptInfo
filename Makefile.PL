@@ -7,11 +7,12 @@ WriteMakefile(
     VERSION_FROM => 'lib/Mail/SpamAssassin/Plugin/ScriptInfo.pm',
     PREREQ_PM => {
         'Mail::SpamAssassin' => '4.0.1',
+        'Mail::SpamAssassin::Plugin::AttachmentDetail' => 0,
         'HTML::Parser'       => 0,
     },
     AUTHOR => 'Kent Oyer <kent@mxguardian.net>',
     LICENSE => 'apache_2_0',
-    ABSTRACT => 'SpamAssassin plugin to analyze scripts embedded in HTML messages and attachments',
+    ABSTRACT => 'SpamAssassin plugin to analyze scripts embedded in HTML attachments',
     BUILD_REQUIRES => {
         'Test::More'          => 0,
         'ExtUtils::MakeMaker' => 6.31

@@ -1,7 +1,6 @@
 # NAME
 
-Mail::SpamAssassin::Plugin::ScriptInfo - SpamAssassin plugin to analyze scripts embedded in HTML messages
-and attachments
+Mail::SpamAssassin::Plugin::ScriptInfo - SpamAssassin plugin to analyze scripts embedded in HTML attachments
 
 # SYNOPSIS
 
@@ -9,7 +8,13 @@ and attachments
 
 # DESCRIPTION
 
-This plugin analyzes scripts embedded in HTML messages and attachments
+This plugin analyzes scripts embedded in HTML attachments. Most of the time this will be
+JavaScript, but it will match any text found inside a &lt;script> tag as well as any text
+found in certain HTML tag attributes such as &lt;a href="javascript:..."> or 'on\*' event handlers.
+
+NOTE: This plugin does not inspect scripts in the HTML body of the message. It only inspects
+scripts in HTML attachments. This is to avoid false positives and is generally safe because
+most modern email clients will not execute scripts in the message body.
 
 # CONFIGURATION
 
@@ -27,6 +32,15 @@ The following configuration options are available:
 
         script  JS_REDIRECT     /\bwindow\.location(\.href)?\s*=/
         score   JS_REDIRECT     5.0
+
+    You can also use the 'multiple' flag to match multiple times in the same script. The 'maxhits' flag can be
+    used to limit the number of hits that will trigger a match.
+
+        # sample rule
+        script  __HEX_CONSTANT  /0x[0-9A-F]/i
+        tflags  __HEX_CONSTANT  multiple maxhits=10
+        meta    JS_OBFUSCATION  __HEX_CONSTANT == 10
+        score   JS_OBFUSCATION  5.0
 
 - check\_script\_contains\_email()
 
