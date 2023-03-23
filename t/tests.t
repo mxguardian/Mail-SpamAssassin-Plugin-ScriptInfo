@@ -19,7 +19,7 @@ my $spamassassin = Mail::SpamAssassin->new(
             loadplugin Mail::SpamAssassin::Plugin::ScriptInfo
             body    SCRIPT_INFO_01     eval:check_script_contains_email()
             script  SCRIPT_INFO_02     /(\\x[a-f0-9]{2}){5}/i
-            script  SCRIPT_INFO_03     /\batob\(/
+            script  SCRIPT_INFO_03     /\b(atob|unescape)\(/
             script  SCRIPT_INFO_04     /\babcdefghi/
             script  __SCRIPT_INFO_05   /\b0x\d/
             tflags  __SCRIPT_INFO_05   multiple maxhits=10
@@ -66,7 +66,13 @@ my @files = (
         pattern_hits => {
             'SCRIPT_INFO_04' => 'abcdefghi'
         }
-    }
+    },
+    # ATD3nA9hT3Hd - test for false positive
+    {
+        name         => 'msg5.eml',
+        hits         => {},
+        pattern_hits => {},
+    },
 );
 
 plan tests => scalar(@files) * 2;

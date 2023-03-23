@@ -10,7 +10,7 @@ use HTML::Parser;
 use Data::Dumper;
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 =head1 NAME
 
@@ -229,9 +229,12 @@ sub _get_script_text {
         }, 'tagname' ],
     );
 
-    # cycle through all parts of the message and parse any text/html parts
+    # cycle through all parts of the message and parse any text/html attachments
     foreach my $p ($pms->{msg}->find_parts(qr/./)) {
         next unless $p->effective_type eq 'text/html';
+        # ignore inline parts without a name. Modern email clients won't execute scripts in the body
+        # so we skip these parts to avoid false positives.
+        next unless defined $p->{name};
 
         my $text = $p->decode();
 
