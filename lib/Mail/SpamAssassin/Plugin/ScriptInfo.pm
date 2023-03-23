@@ -10,7 +10,7 @@ use HTML::Parser;
 use Data::Dumper;
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 =head1 NAME
 
@@ -145,14 +145,32 @@ sub _run_script_rules {
         my $script_text = $self->_get_script_text($pms);
         foreach my $name (keys %{$pms->{conf}->{script_rules}}) {
             my $re = $pms->{conf}->{script_rules}->{$name};
+            my $tflags = $pms->{conf}->{tflags}->{$name} || '';
             dbg("running rule $name $re");
-            foreach my $line (@$script_text) {
-                if ( $line =~ /$re/p ) {
-                    dbg(qq(ran rule $name ======> got hit ").(defined ${^MATCH} ? ${^MATCH} : '<negative match>').qq("));
-                    $pms->{pattern_hits}->{$name} = ${^MATCH} if defined ${^MATCH};
+            if ( $tflags =~ /\bmultiple\b/ ) {
+                my $hits = 0;
+                my $maxhits = $1 if ($tflags =~ /\bmaxhits=(\d+)\b/);
+                foreach my $line (@$script_text) {
+                    while ( $line =~ /$re/g ) {
+                        $hits++;
+                        last if defined $maxhits && $hits >= $maxhits;
+                    }
+                    last if defined $maxhits && $hits >= $maxhits;
+                }
+                if ( $hits > 0 ) {
+                    dbg(qq(ran rule $name ======> got hit ($hits)"));
                     my $score = $pms->{conf}->{scores}->{$name} || 1;
-                    $pms->got_hit($name,'SCRIPT: ','ruletype' => 'rawbody', 'score' => $score);
-                    last;
+                    $pms->got_hit($name,'SCRIPT: ','ruletype' => 'rawbody', 'score' => $score, 'value' => $hits);
+                }
+            } else {
+                foreach my $line (@$script_text) {
+                    if ( $line =~ /$re/p ) {
+                        dbg(qq(ran rule $name ======> got hit ").(defined ${^MATCH} ? ${^MATCH} : '<negative match>').qq("));
+                        $pms->{pattern_hits}->{$name} = ${^MATCH} if defined ${^MATCH};
+                        my $score = $pms->{conf}->{scores}->{$name} || 1;
+                        $pms->got_hit($name,'SCRIPT: ','ruletype' => 'rawbody', 'score' => $score);
+                        last;
+                    }
                 }
             }
         }

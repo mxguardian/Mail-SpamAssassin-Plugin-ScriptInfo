@@ -21,6 +21,9 @@ my $spamassassin = Mail::SpamAssassin->new(
             script  SCRIPT_INFO_02     /(\\x[a-f0-9]{2}){5}/i
             script  SCRIPT_INFO_03     /\batob\(/
             script  SCRIPT_INFO_04     /\babcdefghi/
+            script  __SCRIPT_INFO_05   /\b0x\d/
+            tflags  __SCRIPT_INFO_05   multiple maxhits=10
+            meta    SCRIPT_INFO_05     __SCRIPT_INFO_05 >= 9
 EOF
             ,
     }
@@ -43,6 +46,7 @@ my @files = (
             'SCRIPT_INFO_02' => '\x62\x63\x62\x35\x37'
         }
     },
+    # 6hVKn5WBw9vP
     {
         name         => 'msg3.eml',
         hits         => {
@@ -52,10 +56,12 @@ my @files = (
             'SCRIPT_INFO_03' => 'atob('
         }
     },
+    # G05CpWM2ijud
     {
         name         => 'msg4.eml',
         hits         => {
             'SCRIPT_INFO_04' => 1,
+            'SCRIPT_INFO_05' => 1,
         },
         pattern_hits => {
             'SCRIPT_INFO_04' => 'abcdefghi'
