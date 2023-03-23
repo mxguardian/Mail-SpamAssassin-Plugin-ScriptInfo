@@ -10,7 +10,7 @@ use HTML::Parser;
 use Data::Dumper;
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 =head1 NAME
 
@@ -55,7 +55,7 @@ used to limit the number of hits that will trigger a match.
     # sample rule
     script  __HEX_CONSTANT  /0x[0-9A-F]/i
     tflags  __HEX_CONSTANT  multiple maxhits=10
-    meta    JS_OBFUSCATION  __HEX_CONSTANT == 10
+    meta    JS_OBFUSCATION  __HEX_CONSTANT > 9
     score   JS_OBFUSCATION  5.0
 
 =item check_script_contains_email()
@@ -64,8 +64,8 @@ This rule checks for the presence of the recipient's email address in the
 script text.  This is useful for detecting phishing attacks.
 
     # sample rule
-    body  JS_PHISHING     eval:check_script_contains_email()
-    score JS_PHISHING     5.0
+    script  JS_PHISHING     eval:check_script_contains_email()
+    score   JS_PHISHING     5.0
 
 =back
 
@@ -117,13 +117,17 @@ sub set_config {
             my $name = $1;
             my $pattern = $2;
 
-            my ($re, $err) = compile_regexp($pattern, 1);
-            if (!$re) {
-                dbg("Error parsing rule: invalid regexp '$pattern': $err");
-                return $Mail::SpamAssassin::Conf::INVALID_VALUE;
-            }
+            if ( $pattern =~ /^eval:(.*)/ ) {
+                $conf->{parser}->add_test($name, $1, $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+            } else {
+                my ($re, $err) = compile_regexp($pattern, 1);
+                if (!$re) {
+                    dbg("Error parsing rule: invalid regexp '$pattern': $err");
+                    return $Mail::SpamAssassin::Conf::INVALID_VALUE;
+                }
 
-            $conf->{parser}->{conf}->{script_rules}->{$name} = $re;
+                $conf->{parser}->{conf}->{script_rules}->{$name} = $re;
+            }
 
         }
     });

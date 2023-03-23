@@ -17,7 +17,7 @@ my $spamassassin = Mail::SpamAssassin->new(
         debug              => 0,
         pre_config_text        => <<'EOF'
             loadplugin Mail::SpamAssassin::Plugin::ScriptInfo
-            body    SCRIPT_INFO_01     eval:check_script_contains_email()
+            script  SCRIPT_INFO_01     eval:check_script_contains_email()
             script  SCRIPT_INFO_02     /(\\x[a-f0-9]{2}){5}/i
             script  SCRIPT_INFO_03     /\b(atob|unescape)\(/
             script  SCRIPT_INFO_04     /\babcdefghi/
