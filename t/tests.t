@@ -19,6 +19,8 @@ my $spamassassin = Mail::SpamAssassin->new(
             loadplugin Mail::SpamAssassin::Plugin::ScriptInfo
             body    SCRIPT_INFO_01     eval:check_script_contains_email()
             script  SCRIPT_INFO_02     /(\\x[a-f0-9]{2}){5}/i
+            script  SCRIPT_INFO_03     /\batob\(/
+            script  SCRIPT_INFO_04     /\babcdefghi/
 EOF
             ,
     }
@@ -39,6 +41,24 @@ my @files = (
         },
         pattern_hits => {
             'SCRIPT_INFO_02' => '\x62\x63\x62\x35\x37'
+        }
+    },
+    {
+        name         => 'msg3.eml',
+        hits         => {
+            'SCRIPT_INFO_03' => 1,
+        },
+        pattern_hits => {
+            'SCRIPT_INFO_03' => 'atob('
+        }
+    },
+    {
+        name         => 'msg4.eml',
+        hits         => {
+            'SCRIPT_INFO_04' => 1,
+        },
+        pattern_hits => {
+            'SCRIPT_INFO_04' => 'abcdefghi'
         }
     }
 );

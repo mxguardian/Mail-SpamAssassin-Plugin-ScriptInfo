@@ -5,9 +5,12 @@ package Mail::SpamAssassin::Plugin::ScriptInfo;
 use Mail::SpamAssassin::Plugin;
 use Mail::SpamAssassin::Logger ();
 use Mail::SpamAssassin::Util qw(compile_regexp);
+use MIME::Base64;
+use HTML::Parser;
+use Data::Dumper;
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 =head1 NAME
 
@@ -66,6 +69,7 @@ under the terms of the Apache License, Version 2.0.
 =cut
 
 sub dbg { Mail::SpamAssassin::Logger::dbg ("ScriptInfo: @_"); }
+sub info { Mail::SpamAssassin::Logger::info ("ScriptInfo: @_"); }
 
 sub new {
     my $class = shift;
@@ -162,10 +166,89 @@ sub _get_script_text {
     return $pms->{script_text} if defined $pms->{script_text};
 
     $pms->{script_text} = [];
+
+    # initialize the parser
+    my $script_tag = 0; my $style_tag = 0;
+    my $parser = HTML::Parser->new(
+        api_version => 3,
+        start_h => [ sub {
+            my ($tagname, $attr, $attrseq) = @_;
+            if (lc($tagname) eq 'script') {
+                $script_tag++;
+            } elsif ( lc($tagname) eq 'style' ) {
+                $style_tag++;
+            }
+            # check for attributes that contain script
+            foreach my $attrname (grep /^on/i, keys %$attr) {
+                push @{$pms->{script_text}}, $attr->{$attrname};
+            }
+            # check for javascript: and data: URIs
+            if ( defined($attr->{href}) ) {
+                if ( $attr->{href} =~ /^javascript:/i ) {
+                    push @{$pms->{script_text}}, substr($attr->{href}, 11);
+                } elsif ( $attr->{href} =~ /^data:([^,;]*)(;base64)?,(.*)/i ) {
+                    if ( $2 eq ';base64' ) {
+                        push @{$pms->{script_text}}, MIME::Base64::decode_base64($3);
+                    } else {
+                        push @{$pms->{script_text}}, $3;
+                    }
+                }
+            }
+        }, 'tagname, attr, attrseq' ],
+        text_h => [ sub {
+            my ($dtext, $is_cdata) = @_;
+            if ( $script_tag > 0 ) {
+                push @{$pms->{script_text}}, $dtext if (defined($dtext));
+            }
+        }, 'dtext, is_cdata' ],
+        end_h => [ sub {
+            my ($tagname) = @_;
+            if (lc($tagname) eq 'script') {
+                $script_tag--;
+            } elsif (lc($tagname) eq 'style') {
+                $style_tag--;
+            }
+        }, 'tagname' ],
+    );
+
+    # cycle through all parts of the message and parse any text/html parts
     foreach my $p ($pms->{msg}->find_parts(qr/./)) {
-        next unless defined $p->{html_results}->{script};
-        push @{$pms->{script_text}}, @{$p->{html_results}->{script}};
+        next unless $p->effective_type eq 'text/html';
+
+        my $text = $p->decode();
+
+        # Normalize unicode quotes, messes up attributes parsing
+        # U+201C e2 80 9c LEFT DOUBLE QUOTATION MARK
+        # U+201D e2 80 9d RIGHT DOUBLE QUOTATION MARK
+        # Examples of input:
+        # <a href=\x{E2}\x{80}\x{9D}https://foobar.com\x{E2}\x{80}\x{9D}>
+        # .. results in uri "\x{E2}\x{80}\x{9D}https://foobar.com\x{E2}\x{80}\x{9D}"
+        if (utf8::is_utf8($text)) {
+            $text =~ s/(?:\x{201C}|\x{201D})/"/g;
+        } else {
+            $text =~ s/\x{E2}\x{80}(?:\x{9C}|\x{9D})/"/g;
+        }
+
+        # call the parser
+        eval {
+            local $SIG{__WARN__} = sub {
+                my $err = $_[0];
+                $err =~ s/\s+/ /gs; $err =~ s/(.*) at .*/$1/s;
+                info("HTML::Parser warning: $err");
+            };
+            $parser->parse($text);
+        };
+
+        # bug 7437: deal gracefully with HTML::Parser misbehavior on unclosed <style> and <script> tags
+        # (typically from not passing the entire message to spamc, but possibly a DoS attack)
+        $parser->parse("</style>") while $style_tag > 0;
+        $parser->parse("</script>") while $script_tag > 0;
+
+        $parser->eof();
+
     }
+
+    # print $_ foreach @{$pms->{script_text}}; print "\n";
 
     return $pms->{script_text};
 }

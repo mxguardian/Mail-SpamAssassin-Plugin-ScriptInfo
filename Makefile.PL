@@ -6,7 +6,8 @@ WriteMakefile(
     NAME => 'Mail::SpamAssassin::Plugin::ScriptInfo',
     VERSION_FROM => 'lib/Mail/SpamAssassin/Plugin/ScriptInfo.pm',
     PREREQ_PM => {
-        'Mail::SpamAssassin' => '4.0.0',
+        'Mail::SpamAssassin' => '4.0.1',
+        'HTML::Parser'       => 0,
     },
     AUTHOR => 'Kent Oyer <kent@mxguardian.net>',
     LICENSE => 'apache_2_0',
