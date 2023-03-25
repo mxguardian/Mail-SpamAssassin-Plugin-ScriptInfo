@@ -39,7 +39,7 @@ The following configuration options are available:
         # sample rule
         script  __HEX_CONSTANT  /0x[0-9A-F]/i
         tflags  __HEX_CONSTANT  multiple maxhits=10
-        meta    JS_OBFUSCATION  __HEX_CONSTANT == 10
+        meta    JS_OBFUSCATION  __HEX_CONSTANT > 9
         score   JS_OBFUSCATION  5.0
 
 - check\_script\_contains\_email()
@@ -48,8 +48,20 @@ The following configuration options are available:
     script text.  This is useful for detecting phishing attacks.
 
         # sample rule
-        body  JS_PHISHING     eval:check_script_contains_email()
-        score JS_PHISHING     5.0
+        script  JS_PHISHING     eval:check_script_contains_email()
+        score   JS_PHISHING     5.0
+
+- script\_ignore\_md5
+
+    This directive allows you to ignore certain HTML attachments that match a fuzzy MD5 checksum. This is useful
+    if you have a particular HTML attachment that is known to contain scripts that are not malicious.
+
+        # sample rule (Cisco Secure Message)
+        script_ignore_md5  10DBD19204B70CF81AB952A0F6CABEA7
+
+    To obtain the fuzzy MD5 hash of an attachment in a message, run the following command:
+
+        cat /path/to/message | spamassassin -L -D ScriptInfo |& grep md5
 
 # AUTHOR
 

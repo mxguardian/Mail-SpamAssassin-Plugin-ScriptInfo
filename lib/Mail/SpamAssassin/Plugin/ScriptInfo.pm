@@ -7,10 +7,11 @@ use Mail::SpamAssassin::Logger ();
 use Mail::SpamAssassin::Util qw(compile_regexp);
 use MIME::Base64;
 use HTML::Parser;
+use Digest::MD5;
 use Data::Dumper;
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 =head1 NAME
 
@@ -67,6 +68,18 @@ script text.  This is useful for detecting phishing attacks.
     script  JS_PHISHING     eval:check_script_contains_email()
     score   JS_PHISHING     5.0
 
+=item script_ignore_md5
+
+This directive allows you to ignore certain HTML attachments that match a fuzzy MD5 checksum. This is useful
+if you have a particular HTML attachment that is known to contain scripts that are not malicious.
+
+    # sample rule (Cisco Secure Message)
+    script_ignore_md5  10DBD19204B70CF81AB952A0F6CABEA7
+
+To obtain the fuzzy MD5 hash of an attachment in a message, run the following command:
+
+    cat /path/to/message | spamassassin -L -D ScriptInfo |& grep md5
+
 =back
 
 =head1 AUTHOR
@@ -105,32 +118,44 @@ sub set_config {
     my ($self, $conf) = @_;
     my @cmds;
 
-    push (@cmds, {
-        setting => 'script',
-        is_priv => 1,
-        code => sub {
-            my ($self, $key, $value, $line) = @_;
+    push (@cmds, (
+        {
+            setting => 'script',
+            is_priv => 1,
+            type => $Mail::SpamAssassin::Conf::CONF_TYPE_STRING,
+            code => sub {
+                my ($self, $key, $value, $line) = @_;
 
-            if ($value !~ /^(\S+)\s+(.+)$/) {
-                return $Mail::SpamAssassin::Conf::INVALID_VALUE;
-            }
-            my $name = $1;
-            my $pattern = $2;
-
-            if ( $pattern =~ /^eval:(.*)/ ) {
-                $conf->{parser}->add_test($name, $1, $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
-            } else {
-                my ($re, $err) = compile_regexp($pattern, 1);
-                if (!$re) {
-                    dbg("Error parsing rule: invalid regexp '$pattern': $err");
+                if ($value !~ /^(\S+)\s+(.+)$/) {
                     return $Mail::SpamAssassin::Conf::INVALID_VALUE;
                 }
+                my $name = $1;
+                my $pattern = $2;
 
-                $conf->{parser}->{conf}->{script_rules}->{$name} = $re;
+                if ( $pattern =~ /^eval:(.*)/ ) {
+                    $conf->{parser}->add_test($name, $1, $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+                } else {
+                    my ($re, $err) = compile_regexp($pattern, 1);
+                    if (!$re) {
+                        dbg("Error parsing rule: invalid regexp '$pattern': $err");
+                        return $Mail::SpamAssassin::Conf::INVALID_VALUE;
+                    }
+
+                    $conf->{parser}->{conf}->{script_rules}->{$name} = $re;
+                }
+
             }
-
+        },
+        {
+            setting => 'script_ignore_md5',
+            is_priv => 1,
+            type => $Mail::SpamAssassin::Conf::CONF_TYPE_STRINGLIST,
+            code => sub {
+                my ($self, $key, $value, $line) = @_;
+                $conf->{parser}->{conf}->{script_ignore_md5}->{uc($value)} = 1;
+            }
         }
-    });
+    ));
 
     $conf->{parser}->register_commands(\@cmds);
 }
@@ -207,44 +232,68 @@ sub _get_script_text {
     my $script_tag = 0; my $style_tag = 0;
     my $parser = HTML::Parser->new(
         api_version => 3,
+        start_document_h => [ sub {
+            my ($self) = @_;
+            $self->{_md5} = Digest::MD5->new;
+            $self->{script_text} = [];
+        }, 'self' ],
         start_h => [ sub {
-            my ($tagname, $attr, $attrseq) = @_;
+            my ($self, $tagname, $attr, $attrseq) = @_;
+            my $md5_text = "$tagname";
+
             if (lc($tagname) eq 'script') {
                 $script_tag++;
             } elsif ( lc($tagname) eq 'style' ) {
                 $style_tag++;
             }
-            # check for attributes that contain script
-            foreach my $attrname (grep /^on/i, keys %$attr) {
-                push @{$pms->{script_text}}, $attr->{$attrname};
-            }
-            # check for javascript: and data: URIs
-            if ( defined($attr->{href}) ) {
-                if ( $attr->{href} =~ /^javascript:/i ) {
-                    push @{$pms->{script_text}}, substr($attr->{href}, 11);
-                } elsif ( $attr->{href} =~ /^data:([^,;]*)(;base64)?,(.*)/i ) {
-                    if ( $2 eq ';base64' ) {
-                        push @{$pms->{script_text}}, MIME::Base64::decode_base64($3);
-                    } else {
-                        push @{$pms->{script_text}}, $3;
+
+            foreach my $attrname (@{$attrseq}) {
+                if ( $attrname =~ /^(?:name|method|type)$/i ) {
+                    $md5_text .= qq( $attrname="$attr->{$attrname}");
+                } elsif ( $attrname =~ /^(?:src|href|action)$/i ) {
+                    next if $tagname =~ /^(?:base|img)$/;
+                    if ( $attr->{$attrname} =~ m{^(https?://[^/]+/[^?]+)}i ) {
+                        # Only include URL's with a non-empty path
+                        # Do not include the query string
+                        $md5_text .= qq( $attrname="$1");
+                    } elsif ( $attr->{$attrname} =~ /^javascript:/i ) {
+                        push @{$self->{script_text}}, substr($attr->{$attrname}, 11);
+                    } elsif ( $attr->{$attrname} =~ /^data:([^,;]*)(;base64)?,(.*)/i ) {
+                        if ( $2 eq ';base64' ) {
+                            push @{$self->{script_text}}, MIME::Base64::decode_base64($3);
+                        } else {
+                            push @{$self->{script_text}}, $3;
+                        }
                     }
+                } elsif ( $attrname =~ /^on/ ) {
+                    push @{$self->{script_text}}, $attr->{$attrname};
                 }
             }
-        }, 'tagname, attr, attrseq' ],
-        text_h => [ sub {
-            my ($dtext, $is_cdata) = @_;
-            if ( $script_tag > 0 ) {
-                push @{$pms->{script_text}}, $dtext if (defined($dtext));
+
+            # <option> tags can screw up the fuzzy checksum, so we skip them
+            unless ( $tagname eq 'option' ) {
+                # print $md5_text, "\n";
+                $self->{_md5}->add($md5_text);
             }
-        }, 'dtext, is_cdata' ],
+        }, 'self, tagname, attr, attrseq' ],
+        text_h => [ sub {
+            my ($self, $dtext, $is_cdata) = @_;
+            if ( $script_tag > 0 ) {
+                push @{$self->{script_text}}, $dtext if (defined($dtext));
+            }
+        }, 'self, dtext, is_cdata' ],
         end_h => [ sub {
-            my ($tagname) = @_;
+            my ($self, $tagname) = @_;
             if (lc($tagname) eq 'script') {
                 $script_tag--;
             } elsif (lc($tagname) eq 'style') {
                 $style_tag--;
             }
-        }, 'tagname' ],
+        }, 'self, tagname' ],
+        end_document_h => [ sub {
+            my ($self) = @_;
+            $self->{md5} = uc($self->{_md5}->hexdigest);
+        }, 'self' ],
     );
 
     defined($pms->{attachments}) or
@@ -282,8 +331,17 @@ sub _get_script_text {
         # (typically from not passing the entire message to spamc, but possibly a DoS attack)
         $parser->parse("</style>") while $style_tag > 0;
         $parser->parse("</script>") while $script_tag > 0;
-
         $parser->eof();
+
+        # check md5 against the ignore list
+        my $md5 = $parser->{md5};
+        dbg("name=$a->{name} md5=$md5");
+        if ( defined($pms->{conf}->{script_ignore_md5}->{$md5}) ) {
+            dbg("Skipping due to md5 match");
+        } else {
+            # add the parsed text to the list of script text
+            push(@{$pms->{script_text}}, @{$parser->{script_text}});
+        }
 
     }
 
