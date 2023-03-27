@@ -83,6 +83,15 @@ my @files = (
             'SCRIPT_INFO_03' => 'atob('
         },
     },
+    # wLDWEXRsomBW - email in data- attribute
+    {
+        name         => 'msg7.eml',
+        hits         => {
+            'SCRIPT_INFO_01' => 1,
+        },
+        pattern_hits => {
+        },
+    },
 );
 
 plan tests => scalar(@files) * 2;

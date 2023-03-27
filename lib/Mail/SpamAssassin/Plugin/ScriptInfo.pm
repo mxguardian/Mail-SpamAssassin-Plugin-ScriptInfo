@@ -11,7 +11,7 @@ use Digest::MD5;
 use Data::Dumper;
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 =head1 NAME
 
@@ -250,7 +250,7 @@ sub _get_script_text {
             foreach my $attrname (@{$attrseq}) {
                 if ( $attrname =~ /^(?:name|method|type)$/i ) {
                     $md5_text .= qq( $attrname="$attr->{$attrname}");
-                } elsif ( $attrname =~ /^(?:src|href|action)$/i ) {
+                } elsif ( $attrname =~ /^(?:src|href|action|data)$/i ) {
                     next if $tagname =~ /^(?:base|img)$/;
                     if ( $attr->{$attrname} =~ m{^(https?://[^/]+/[^?]+)}i ) {
                         # Only include URL's with a non-empty path
@@ -258,14 +258,19 @@ sub _get_script_text {
                         $md5_text .= qq( $attrname="$1");
                     } elsif ( $attr->{$attrname} =~ /^javascript:/i ) {
                         push @{$self->{script_text}}, substr($attr->{$attrname}, 11);
-                    } elsif ( $attr->{$attrname} =~ /^data:([^,;]*)(;base64)?,(.*)/i ) {
+                    } elsif ( $attr->{$attrname} =~ /^data:([^,;]*)(;base64)?,(.*)/ims ) {
+                        # print "===========================\n".Dumper($attr)."\n===========================\n";
                         if ( $2 eq ';base64' ) {
                             push @{$self->{script_text}}, MIME::Base64::decode_base64($3);
                         } else {
                             push @{$self->{script_text}}, $3;
                         }
                     }
+                } elsif ( $attrname =~ /^data-/ ) {
+                    # malicious stuff can hide in data attributes
+                    push @{$self->{script_text}}, qq(<$tagname $attrname=").$attr->{$attrname}.qq(">\n);
                 } elsif ( $attrname =~ /^on/ ) {
+                    # extract code in event handlers
                     push @{$self->{script_text}}, $attr->{$attrname};
                 }
             }

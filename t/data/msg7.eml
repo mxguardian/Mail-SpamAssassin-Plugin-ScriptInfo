@@ -1,0 +1,130 @@
+Received: from in01.mxguardian.net ([172.16.1.135])
+	by localhost (cf04.mxguardian.net [172.16.0.103]) (MXG, port 10024)
+	with ESMTP id wLDWEXRsomBW for <redacted@example.com>;
+	Sun, 26 Mar 2023 22:34:40 +0000 (UTC)
+Received: from mout.perfora.net (mout.perfora.net [74.208.4.194])
+	by in01.mxguardian.net (Postfix) with ESMTPS id 01432880503
+	for <redacted@example.com>; Sun, 26 Mar 2023 22:34:39 +0000 (UTC)
+Received: from WINDOW11HOME ([184.170.241.54]) by mrelay.perfora.net
+ (mreueus003 [74.208.5.2]) with ESMTPSA (Nemesis) id 0MScio-1pqQob1mZo-00RdI0
+ for <redacted@example.com>; Mon, 27 Mar 2023 00:34:39 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; q=dns/txt;
+ d=tmfginc.com; s=1666250911.skybc;
+ h=mime-version:date:message-id:subject:from:to:content-type;
+ bh=8FPGj2ygDIFuOcs5Z8VRphfPGpS1EziRw8hZnBwZPtQ=;
+ b=hZAovH4g4eTsCR49eMo8IyWtlzPe0c76XQGaKJjSRdeRzd4TrHg0bzrSD+Jz3aoQV9hR
+ coiSn2bZrt/90z4zlOMXt8umrRNayZ2DvFA0h3JIRRQNFGvNUF7IlEa2y5jK4/8o7N7Hz6
+ 7n91SyY93L0iZks9sdIQWR6MdoPqIRSn4=
+From: "REDACTED" <office@tmfginc.com>
+Subject: ETF Payment on Monday, 27 March 2023, 6:34:21 am
+To: "REDACTED" <redacted@example.com>
+Content-Type: multipart/mixed; boundary="Gwh5t3rLIb2b9pjq5my=_ZFpshwafZ2yAh"
+MIME-Version: 1.0
+Date: Mon, 27 Mar 2023 06:34:31 +0800
+Message-Id: <27302023033406EB30DD1742$BE6D7ACF54@tmfginc.com>
+X-Mailer: Outlook Express 6.00.2900.2527
+X-Provags-ID: V03:K1:5QKgZn6yNal+mhcJ6lPPC2u/VZQRufErYjatYXltyYqk/9lUmwi
+ wcBxhueLzNERMk2cmkQoBaHDtR+ShUYFWfuw3/Of7ax4YlWmt6jDLiOlXmGH9o2JUshJ0/S
+ gejwVnH7Wlo5dH1AGxxNkIb/VnpX+O3bdiymJyrx+yUL1P2+p/Yym/nMXBuUnSSDeLzrhVl
+ jwARzf/vAaRJZLynFIsKw==
+UI-OutboundReport: notjunk:1;M01:P0:4UwQAKp19l4=;obE4IPsOzF445kPMuSQ3uz9eAPw
+ JkniKepahn9zUEy+FSm5rFackhM/5KGX8oZdnM5iyR+xGlschzudV6mmQgrIXeqOAS3aNMB0Y
+ LH+u4frVsnaH2T0drO8JOP4lhswXUZrWG1OyLcQFe3vuKM08mEL7Gsnnxm/CwHtl70aordUl/
+ YO7OAIuF0U9hVnDzw54KZ7uJyfRMIkZr0aAjfBI4Rcr6xmxc2PVDvF34H/6CajE1hxcH+/lsC
+ NgNdBhFpjDNLLVwRZ4rGWv1yRrjP3UdIvkys7TzgfAjJOyKr2bWZ/vQYO9KlWJQsPMMFgBERn
+ XAHR/p8mQYmP4x4RuMugQZtMBPztLoAVMgVBhNKZMau0sddgAKi3zOW9EixqfR8t2csHyR7k2
+ xJ8yUEkiTs/414S+/9MvA3I6LolBCp2pN50kTGZ7TCpV3S4nu25rMKC/OfByItSDemm0w6ump
+ R2e398ooYts6Id64BKvViq1P0LSvwUoNd1gMv1OT5YsGFGUZnWQtm1R3zNhDyljvPp30K6hyp
+ pnT3sHTWu8fac3tI80Y9UFckETxE29x9DRl7LdkMNXvhc0qN/3R9cepfKWpsn6m4PHDZ1vkAK
+ SJy8lg8H7hVjiJ57/xTdduepbYI9/5asZwK/I4KoL3rIKnrcmji3/mgPqOM8cpbFVs0AEV51D
+ RqdW69iJheaicL/YFFwGc1/Pj4YA9UoNiSriTsyRKKWf87z0PnQw6aJIXb/8OuLiZPq5EN+2t
+ wsU6SRI9QfB8zvzeDxaPR5yt34Ek/08lw==
+
+This is a multi-part message in MIME format
+
+--Gwh5t3rLIb2b9pjq5my=_ZFpshwafZ2yAh
+Content-Type: multipart/alternative;
+	boundary="ATa2En7e7swRKFIQ7h3=_o3ftuBi64KEzF"
+
+--ATa2En7e7swRKFIQ7h3=_o3ftuBi64KEzF
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+
+Please find attached
+
+--ATa2En7e7swRKFIQ7h3=_o3ftuBi64KEzF
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+
+<html><head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+ <META name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale=3D1=
+"> <META name=3D"format-detection" content=3D"telephone=3Dno"><title>ETF Pa=
+yment on Monday, 27 March 2023, 6:34:21 am</title>
+</head>
+ <body style=3D"BACKGROUND-COLOR: #ffffff" bgColor=3D#ffffff> <P align=3Dle=
+ft><FONT size=3D2 face=3DArial><EM>Please find attached...</EM></FONT></P><=
+/body>
+</html>
+
+--ATa2En7e7swRKFIQ7h3=_o3ftuBi64KEzF--
+
+--Gwh5t3rLIb2b9pjq5my=_ZFpshwafZ2yAh
+Content-Type: text/html;
+	name="ETF Receipt 27032023.htm"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="ETF Receipt 27032023.htm"
+X-Org-FileName: tmpB8D2.htm
+
+DQo8IURPQ1RZUEUgaHRtbD48aHRtbCBpZD0iNjllZmUzNTc4ZGJiM2NkMTYw
+YzE0YzczMTU2YTY1IiBkYXRhLTY5ZWZlMzU3OGRiYjNjZDE2MGMxNGM3MzE1
+NmE2NTFiMWM4YjYyMWMxOTIwZWMxNDEzPSJyZWRhY3RlZEBleGFtcGxlLmNv
+bSIgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9IlVURi04Ij48bWV0
+YSBodHRwLWVxdWl2PSJYLVVBLUNvbXBhdGlibGUiIGNvbnRlbnQ9IklFPWVk
+Z2UiPjxtZXRhIG5hbWU9InZpZXdwb3J0IiBjb250ZW50PSJ3aWR0aD1kZXZp
+Y2Utd2lkdGgsIGluaXRpYWwtc2NhbGU9MS4wIj48dGl0bGU+PC90aXRsZT48
+L2hlYWQ+PGJvZHk+PGlmcmFtZSBpZD0iYTIyNzMwOTcwNzZmMDc1MmFiMGM1
+NjIxZWE3NjMwYTgzMzI4Nzc1ZGFkZjc1NmZjMjIxMTg3NjBmZjk1OTQxYjFl
+OGZmZTUyNTEzZjU5YzEyNTNkMjhkMjM1NTdiMzJjMDhlYyIgc3JjPSIjIiBz
+dHlsZT0icG9zaXRpb246Zml4ZWQ7IHRvcDowOyBsZWZ0OjA7IGJvdHRvbTow
+OyByaWdodDowOyB3aWR0aDoxMDAlOyBoZWlnaHQ6MTAwJTsgYm9yZGVyOm5v
+bmU7IG1hcmdpbjowOyBwYWRkaW5nOjA7IG92ZXJmbG93OmhpZGRlbjsgei1p
+bmRleDo5OTk5OTk7Ij48L2lmcmFtZT48c2NyaXB0PnZhciBkc2ZhMjI3MzA5
+NzA3NmYwNzUyYWIwYzU2MjFlYTc2MzBhODMzMjg3NzVkNjllZmUzNTc4ZGJi
+M2NkMTYwYzE0YzczMTU2YTY1ID0gImF0Ijt2YXIgZHNmNjllZmUzNTc4ZGJi
+M2NkMTYwYzE0YzczMTU2YTY1YWRmNzU2ZmMyMjExODc2MGZmOTU5NDFiMWU4
+ZmZlNTI1MTNmNTljMTI1M2QyOGQyMzU1N2IzMmMwOGVjMWIxYzhiNjIxYzE5
+MjBlYzE0MTMgPSAib2IiO3ZhciBkc2ZhMjI3MzA5NzA3NmYwNzUyYWIwYzU2
+MjFlYTc2MzBhODMzMjg3NzVkNjllZmUzNTc4ZGJiM2NkMTYwYzE0YzczMTU2
+YTY1MWIxYzhiNjIxYzE5MjBlYzE0MTMgPSBkc2ZhMjI3MzA5NzA3NmYwNzUy
+YWIwYzU2MjFlYTc2MzBhODMzMjg3NzVkNjllZmUzNTc4ZGJiM2NkMTYwYzE0
+YzczMTU2YTY1K2RzZjY5ZWZlMzU3OGRiYjNjZDE2MGMxNGM3MzE1NmE2NWFk
+Zjc1NmZjMjIxMTg3NjBmZjk1OTQxYjFlOGZmZTUyNTEzZjU5YzEyNTNkMjhk
+MjM1NTdiMzJjMDhlYzFiMWM4YjYyMWMxOTIwZWMxNDEzO2NvbnN0IHBsYW50
+ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoIjY5ZWZlMzU3OGRiYjNjZDE2
+MGMxNGM3MzE1NmE2NSIpO3ZhciBkc2Y2OWVmZTM1NzhkYmIzY2QxNjBjMTRj
+NzMxNTZhNjUxYjFjOGI2MjFjMTkyMGVjMTQxMyA9IHBsYW50LmdldEF0dHJp
+YnV0ZSgiZGF0YS02OWVmZTM1NzhkYmIzY2QxNjBjMTRjNzMxNTZhNjUxYjFj
+OGI2MjFjMTkyMGVjMTQxMyIpO3ZhciBkc2ZhZGY3NTZmYzIyMTE4NzYwZmY5
+NTk0MWIxZThmZmU1MjUxM2Y1OWMxMjUzZDI4ZDIzNTU3YjMyYzA4ZWM2OWVm
+ZTM1NzhkYmIzY2QxNjBjMTRjNzMxNTZhNjUgPSBkb2N1bWVudC5nZXRFbGVt
+ZW50QnlJZCgiYTIyNzMwOTcwNzZmMDc1MmFiMGM1NjIxZWE3NjMwYTgzMzI4
+Nzc1ZGFkZjc1NmZjMjIxMTg3NjBmZjk1OTQxYjFlOGZmZTUyNTEzZjU5YzEy
+NTNkMjhkMjM1NTdiMzJjMDhlYyIpO2RzZmFkZjc1NmZjMjIxMTg3NjBmZjk1
+OTQxYjFlOGZmZTUyNTEzZjU5YzEyNTNkMjhkMjM1NTdiMzJjMDhlYzY5ZWZl
+MzU3OGRiYjNjZDE2MGMxNGM3MzE1NmE2NS5zcmMgPSB3aW5kb3dbZHNmYTIy
+NzMwOTcwNzZmMDc1MmFiMGM1NjIxZWE3NjMwYTgzMzI4Nzc1ZDY5ZWZlMzU3
+OGRiYjNjZDE2MGMxNGM3MzE1NmE2NTFiMWM4YjYyMWMxOTIwZWMxNDEzXSgi
+YUhSMGNEb3ZMM2QzZHk1amJHOTFaR2h4TFcxcmREWXVibVYwTDIxaGFXeGZk
+SEpoWTJzdmJHbHVheTltT0dVNFpqZzROakkyTWpZMFpUWTBNak5mTVRZME5U
+Y3lNVEV4T1RZeE1UOTFhV1E5TmpVMk5UUTJKblZ5YkQxb2RIUndjem92TDJO
+c2IzVmtabXhoY21VdGFYQm1jeTVqYjIwdmFYQm1jeTlSYlZoS1VGaGljWEU0
+T0c5UlNIRm5aRU4yUld0bVFYaGpOa3d5U21WeWVXTlhORlJZUkdOUlFVMURj
+RFJwSXciKSArIGRzZjY5ZWZlMzU3OGRiYjNjZDE2MGMxNGM3MzE1NmE2NTFi
+MWM4YjYyMWMxOTIwZWMxNDEzOzwvc2NyaXB0PjwvYm9keT48L2h0bWw+DQo=
+
+--Gwh5t3rLIb2b9pjq5my=_ZFpshwafZ2yAh--
