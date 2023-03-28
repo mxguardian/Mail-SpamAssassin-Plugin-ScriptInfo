@@ -11,7 +11,7 @@ use Digest::MD5;
 use Data::Dumper;
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 =head1 NAME
 
@@ -276,10 +276,24 @@ sub _get_script_text {
             }
 
             # <option> tags can screw up the fuzzy checksum, so we skip them
-            unless ( $tagname eq 'option' ) {
-                # print $md5_text, "\n";
-                $self->{_md5}->add($md5_text);
+            return if ($tagname eq 'option');
+
+            if ( defined($attr->{name}) ) {
+                my $name = $attr->{name};
+                $name =~ s/\d+$//; # remove trailing digits
+                if ( defined($self->{_last_name}) && $name eq $self->{_last_name} ) {
+                    # element name is similar to the previous one, so skip it
+                    # e.g. <input name="foo"> <input name="foo1"> <input name="foo2">
+                    return;
+                }
+                $self->{_last_name} = $name;
+            } else {
+                $self->{_last_name} = undef;
             }
+
+            # print $md5_text, "\n";
+            $self->{_md5}->add($md5_text);
+
         }, 'self, tagname, attr, attrseq' ],
         text_h => [ sub {
             my ($self, $dtext, $is_cdata) = @_;
