@@ -16,6 +16,9 @@ NOTE: This plugin does not inspect scripts in the HTML body of the message. It o
 scripts in HTML attachments. This is to avoid false positives and is generally safe because
 most modern email clients will not execute scripts in the message body.
 
+Also, this plugin will add any URI's found in the HTML to the URI list. This is similar to what the URIDetail plugin
+does but is more complete.
+
 # CONFIGURATION
 
 The following configuration options are available:
@@ -63,12 +66,17 @@ The following configuration options are available:
 
         cat /path/to/message | spamassassin -L -D ScriptInfo |& grep md5
 
-# AUTHOR
+# AUTHORS
 
-    Kent Oyer <kent@mxguardian.net>
-    Copyright (C) 2023 MXGuardian, LLC
+Kent Oyer <kent@mxguardian.net>
 
-# LICENSE
+# COPYRIGHT AND LICENSE
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Apache License, Version 2.0.
+Copyright (C) 2023 MXGuardian LLC
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Apache License 2.0. See the LICENSE file included
+with this distribution for more information.
+
+This plugin is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

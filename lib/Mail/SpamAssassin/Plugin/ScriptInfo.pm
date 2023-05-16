@@ -11,7 +11,7 @@ use Digest::MD5;
 use Data::Dumper;
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 =head1 NAME
 
@@ -30,6 +30,9 @@ found in certain HTML tag attributes such as <a href="javascript:..."> or 'on*' 
 NOTE: This plugin does not inspect scripts in the HTML body of the message. It only inspects
 scripts in HTML attachments. This is to avoid false positives and is generally safe because
 most modern email clients will not execute scripts in the message body.
+
+Also, this plugin will add any URI's found in the HTML to the URI list. This is similar to what the URIDetail plugin
+does but is more complete.
 
 =head1 CONFIGURATION
 
@@ -82,15 +85,20 @@ To obtain the fuzzy MD5 hash of an attachment in a message, run the following co
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-   Kent Oyer <kent@mxguardian.net>
-   Copyright (C) 2023 MXGuardian, LLC
+Kent Oyer <kent@mxguardian.net>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Apache License, Version 2.0.
+Copyright (C) 2023 MXGuardian LLC
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Apache License 2.0. See the LICENSE file included
+with this distribution for more information.
+
+This plugin is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut
 
@@ -252,10 +260,13 @@ sub _get_script_text {
                     $md5_text .= qq( $attrname="$attr->{$attrname}");
                 } elsif ( $attrname =~ /^(?:src|href|action|data)$/i ) {
                     next if $tagname =~ /^(?:base|img)$/;
-                    if ( $attr->{$attrname} =~ m{^(https?://[^/]+/[^?]+)}i ) {
-                        # Only include URL's with a non-empty path
-                        # Do not include the query string
-                        $md5_text .= qq( $attrname="$1");
+                    if ( $attr->{$attrname} =~ /^https?:/i ) {
+                        $pms->add_uri_detail_list($attr->{$attrname},{ $tagname => 1 },'ScriptInfo');
+                        if ( $attr->{$attrname} =~ m{^(https?://[^/]+/[^?]+)}i ) {
+                            # Only include URL's with a non-empty path in the checksum
+                            # Do not include the query string
+                            $md5_text .= qq( $attrname="$1");
+                        }
                     } elsif ( $attr->{$attrname} =~ /^javascript:/i ) {
                         push @{$self->{script_text}}, substr($attr->{$attrname}, 11);
                     } elsif ( $attr->{$attrname} =~ /^data:([^,;]*)(;base64)?,(.*)/ims ) {
