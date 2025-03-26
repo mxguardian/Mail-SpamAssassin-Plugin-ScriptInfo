@@ -9,9 +9,11 @@ use MIME::Base64;
 use HTML::Parser;
 use Digest::MD5;
 use Data::Dumper;
+use Encode::Guess;
+use Encode;
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 =head1 NAME
 
@@ -326,26 +328,26 @@ sub _get_script_text {
         }, 'self' ],
     );
 
-    defined($pms->{attachments}) or
-        die "Mail::SpamAssassin::Plugin::ScriptInfo requires Mail::SpamAssassin::Plugin::AttachmentDetail";
-
     # cycle through all parts of the message and parse any text/html attachments
-    foreach my $a ( @{$pms->{attachments}} )  {
-        next unless $a->{effective_type} eq 'text/html';
+    my $msg = $pms->get_message();
+    foreach my $part ( $msg->find_parts(qr/./, 1) )  {
+        my $disposition = $part->{disposition} // '';
+        next unless $disposition eq 'attachment';
+        my $type = $part->effective_type();
+        next unless $type eq 'text/html' or $type eq 'image/svg+xml';
 
-        my $text = $a->{part}->decode();
+        my $text = $part->decode();
+
+        # detect encoding
+        my $enc = guess_encoding($text);
+        if (ref($enc) && $enc->name ne 'utf8') {
+            # convert to utf8
+            $text = $enc->decode($text);
+            $text = encode('utf8', $text);
+        }
 
         # Normalize unicode quotes, messes up attributes parsing
-        # U+201C e2 80 9c LEFT DOUBLE QUOTATION MARK
-        # U+201D e2 80 9d RIGHT DOUBLE QUOTATION MARK
-        # Examples of input:
-        # <a href=\x{E2}\x{80}\x{9D}https://foobar.com\x{E2}\x{80}\x{9D}>
-        # .. results in uri "\x{E2}\x{80}\x{9D}https://foobar.com\x{E2}\x{80}\x{9D}"
-        if (utf8::is_utf8($text)) {
-            $text =~ s/(?:\x{201C}|\x{201D})/"/g;
-        } else {
-            $text =~ s/\x{E2}\x{80}(?:\x{9C}|\x{9D})/"/g;
-        }
+        $text =~ s/\x{E2}\x{80}(?:\x{9C}|\x{9D})/"/g;
 
         # call the parser
         eval {
@@ -365,7 +367,8 @@ sub _get_script_text {
 
         # check md5 against the ignore list
         my $md5 = $parser->{md5};
-        dbg("name=$a->{name} md5=$md5");
+        my $name = $part->{name} // '';
+        dbg("name=$name md5=$md5");
         if ( defined($pms->{conf}->{script_ignore_md5}->{$md5}) ) {
             dbg("Skipping due to md5 match");
         } else {
