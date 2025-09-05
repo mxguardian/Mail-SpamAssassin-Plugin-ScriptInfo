@@ -8,16 +8,19 @@ use Mail::SpamAssassin::Util qw(compile_regexp);
 use MIME::Base64;
 use HTML::Parser;
 use Digest::MD5;
-use Data::Dumper;
 use Encode::Guess;
 use Encode;
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 =head1 NAME
 
 Mail::SpamAssassin::Plugin::ScriptInfo - SpamAssassin plugin to analyze scripts embedded in HTML attachments
+
+=head1 REQUIREMENTS
+
+   SpamAssassin 4.0.2 or higher
 
 =head1 SYNOPSIS
 
@@ -84,6 +87,16 @@ if you have a particular HTML attachment that is known to contain scripts that a
 To obtain the fuzzy MD5 hash of an attachment in a message, run the following command:
 
     cat /path/to/message | spamassassin -L -D ScriptInfo |& grep md5
+
+=item svgtext
+
+This directive allows you to check for a particular text pattern in SVG files.
+The first argument is the name of the rule, and the second argument is a
+regular expression
+
+    # sample rule
+    svgtext  SVG_PHISHING  /dropbox|docusign|sharepoint/i
+    score    SVG_PHISHING  5.0
 
 =back
 
@@ -157,6 +170,33 @@ sub set_config {
             }
         },
         {
+            setting => 'svgtext',
+            is_priv => 1,
+            type => $Mail::SpamAssassin::Conf::CONF_TYPE_STRING,
+            code => sub {
+                my ($self, $key, $value, $line) = @_;
+
+                if ($value !~ /^(\S+)\s+(.+)$/) {
+                    return $Mail::SpamAssassin::Conf::INVALID_VALUE;
+                }
+                my $name = $1;
+                my $pattern = $2;
+
+                if ( $pattern =~ /^eval:(.*)/ ) {
+                    $conf->{parser}->add_test($name, $1, $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+                } else {
+                    my ($re, $err) = compile_regexp($pattern, 1);
+                    if (!$re) {
+                        dbg("Error parsing rule: invalid regexp '$pattern': $err");
+                        return $Mail::SpamAssassin::Conf::INVALID_VALUE;
+                    }
+
+                    $conf->{parser}->{conf}->{svg_rules}->{$name} = $re;
+                }
+
+            }
+        },
+        {
             setting => 'script_ignore_md5',
             is_priv => 1,
             type => $Mail::SpamAssassin::Conf::CONF_TYPE_STRINGLIST,
@@ -186,6 +226,7 @@ sub parsed_metadata {
     my ($self, $opts) = @_;
 
     $self->_run_script_rules($opts);
+    $self->_run_svg_rules($opts);
 
 }
 
@@ -231,12 +272,69 @@ sub _run_script_rules {
 
 }
 
+sub _run_svg_rules {
+    my ($self, $opts) = @_;
+    my $pms = $opts->{permsgstatus};
+
+    # check all svg rules
+    if ( exists $pms->{conf}->{svg_rules} ) {
+        my $svg_text = $self->_get_svg_text($pms);
+        foreach my $name (keys %{$pms->{conf}->{svg_rules}}) {
+            my $re = $pms->{conf}->{svg_rules}->{$name};
+            my $tflags = $pms->{conf}->{tflags}->{$name} || '';
+            dbg("running rule $name $re");
+            if ( $tflags =~ /\bmultiple\b/ ) {
+                my $hits = 0;
+                my $maxhits = $1 if ($tflags =~ /\bmaxhits=(\d+)\b/);
+                foreach my $line (@$svg_text) {
+                    while ( $line =~ /$re/g ) {
+                        $hits++;
+                        last if defined $maxhits && $hits >= $maxhits;
+                    }
+                    last if defined $maxhits && $hits >= $maxhits;
+                }
+                if ( $hits > 0 ) {
+                    dbg(qq(ran rule $name ======> got hit ($hits)"));
+                    my $score = $pms->{conf}->{scores}->{$name} || 1;
+                    $pms->got_hit($name,'SVG: ','ruletype' => 'rawbody', 'score' => $score, 'value' => $hits);
+                }
+            } else {
+                foreach my $line (@$svg_text) {
+                    if ( $line =~ /$re/p ) {
+                        dbg(qq(ran rule $name ======> got hit ").(defined ${^MATCH} ? ${^MATCH} : '<negative match>').qq("));
+                        $pms->{pattern_hits}->{$name} = ${^MATCH} if defined ${^MATCH};
+                        my $score = $pms->{conf}->{scores}->{$name} || 1;
+                        $pms->got_hit($name,'SVG: ','ruletype' => 'rawbody', 'score' => $score);
+                        last;
+                    }
+                }
+            }
+        }
+    }
+
+}
+
 sub _get_script_text {
     my ($self, $pms) = @_;
 
-    return $pms->{script_text} if defined $pms->{script_text};
+    $self->_parse($pms) unless defined $pms->{script_text};
+    return $pms->{script_text};
+
+}
+
+sub _get_svg_text {
+    my ($self, $pms) = @_;
+
+    $self->_parse($pms) unless defined $pms->{svg_text};
+    return $pms->{svg_text};
+
+}
+
+sub _parse {
+    my ($self, $pms) = @_;
 
     $pms->{script_text} = [];
+    $pms->{svg_text} = [];
 
     # initialize the parser
     my $script_tag = 0; my $style_tag = 0;
@@ -246,6 +344,7 @@ sub _get_script_text {
             my ($self) = @_;
             $self->{_md5} = Digest::MD5->new;
             $self->{script_text} = [];
+            $self->{text} = [];
         }, 'self' ],
         start_h => [ sub {
             my ($self, $tagname, $attr, $attrseq) = @_;
@@ -310,8 +409,13 @@ sub _get_script_text {
         }, 'self, tagname, attr, attrseq' ],
         text_h => [ sub {
             my ($self, $dtext, $is_cdata) = @_;
+            return unless defined($dtext);
+            $dtext =~ s/^\s+|\s+$//g; # remove leading/trailing whitespace
+            return if $dtext eq '';
             if ( $script_tag > 0 ) {
-                push @{$self->{script_text}}, $dtext if (defined($dtext));
+                push @{$self->{script_text}}, $dtext;
+            } else {
+                push @{$self->{text}}, $dtext;
             }
         }, 'self, dtext, is_cdata' ],
         end_h => [ sub {
@@ -374,13 +478,14 @@ sub _get_script_text {
         } else {
             # add the parsed text to the list of script text
             push(@{$pms->{script_text}}, @{$parser->{script_text}});
+            push(@{$pms->{svg_text}}, @{$parser->{text}}) if $type eq 'image/svg+xml';
         }
 
     }
 
-    # print $_ foreach @{$pms->{script_text}}; print "\n";
+    # print "$_\n" foreach @{$pms->{script_text}};
+    # print "$_\n" foreach @{$pms->{svg_text}};
 
-    return $pms->{script_text};
 }
 
 1;

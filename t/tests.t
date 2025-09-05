@@ -1,5 +1,6 @@
 use strict;
 use warnings FATAL => 'all';
+use lib 'lib';
 use Test::More;
 use Mail::SpamAssassin;
 use Data::Dumper;
@@ -24,6 +25,7 @@ my $spamassassin = Mail::SpamAssassin->new(
             script  __SCRIPT_INFO_05   /\b0x\d/
             tflags  __SCRIPT_INFO_05   multiple maxhits=10
             meta    SCRIPT_INFO_05     __SCRIPT_INFO_05 >= 9
+            svgtext SCRIPT_INFO_06     /dropbox/i
 EOF
             ,
     }
@@ -90,6 +92,16 @@ my @files = (
             'SCRIPT_INFO_01' => 1,
         },
         pattern_hits => {
+        },
+    },
+    # EryCVAE8C6dN - SVG phishing
+    {
+        name         => 'msg8.eml',
+        hits         => {
+            'SCRIPT_INFO_06' => 1,
+        },
+        pattern_hits => {
+            'SCRIPT_INFO_06' => 'Dropbox'
         },
     },
 );

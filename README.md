@@ -2,6 +2,10 @@
 
 Mail::SpamAssassin::Plugin::ScriptInfo - SpamAssassin plugin to analyze scripts embedded in HTML attachments
 
+# REQUIREMENTS
+
+    SpamAssassin 4.0.2 or higher
+
 # SYNOPSIS
 
     loadplugin     Mail::SpamAssassin::Plugin::ScriptInfo
@@ -65,6 +69,16 @@ The following configuration options are available:
     To obtain the fuzzy MD5 hash of an attachment in a message, run the following command:
 
         cat /path/to/message | spamassassin -L -D ScriptInfo |& grep md5
+
+- svgtext
+
+    This directive allows you to check for a particular text pattern in SVG files.
+    The first argument is the name of the rule, and the second argument is a
+    regular expression
+
+        # sample rule
+        svgtext  SVG_PHISHING  /dropbox|docusign|sharepoint/i
+        score    SVG_PHISHING  5.0
 
 # AUTHORS
 
